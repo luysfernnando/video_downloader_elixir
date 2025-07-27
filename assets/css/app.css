@@ -1,0 +1,10 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "tailwindcss/typography";
+@import "tailwindcss/forms";
+
+@plugin "daisyui";
+/* @import "tailwindcss"; */
+
+/* This file is for your main application CSS */
