@@ -12,7 +12,8 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
       error: nil,
       loading: false,
       show_results: false,
-      processing: false
+      processing: false,
+      download_id: nil
     )}
   end
 
@@ -110,6 +111,17 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
      |> assign(loading: false)}
   end
 
+  def handle_event("start_download", %{"format_id" => format_id, "type" => type}, socket) do
+    # Gera um download_id único
+    download_id = :crypto.hash(:sha256, "#{socket.assigns.url}-#{format_id}-#{type}") |> Base.encode16()
+    Phoenix.PubSub.subscribe(VideoDownloaderElixir.PubSub, "download:#{download_id}")
+    {:noreply, assign(socket, download_id: download_id)}
+  end
+
+  def handle_info({:download_complete, _}, socket) do
+    {:noreply, put_flash(socket, :success, "Arquivo salvo com sucesso!")}
+  end
+
   def render(assigns) do
     ~H"""
     <div class="min-h-screen flex items-center justify-center bg-base-200">
@@ -160,8 +172,8 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
             <% end %>
           <% end %>
 
-          <%= if @formats && @formats != [] do %>
-            <.live_component module={DownloaderResolutions} id="downloader-resolutions" formats={@formats} url={@url} />
+          <%= if !@processing and @formats && @formats != [] do %>
+            <.live_component module={DownloaderResolutions} id="downloader-resolutions" formats={@formats} url={@url} download_id={@download_id} phx-click="start_download" />
           <% end %>
 
           <%= if @error do %>

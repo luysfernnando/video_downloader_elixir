@@ -12,12 +12,17 @@ defmodule VideoDownloaderElixirWeb.Controllers.DownloaderController do
     end
   end
 
-  def download(conn, %{"url" => url, "format_id" => format_id, "type" => type}) do
+  def download(conn, %{"url" => url, "format_id" => format_id, "type" => type} = params) do
     case DownloaderService.download(url, format_id, String.to_atom(type)) do
       {data, 0} when is_binary(data) and byte_size(data) > 0 ->
         {content_type, filename} = case type do
           "audio" -> {"audio/mpeg", "audio.mp3"}
           "video" -> {"video/mp4", "video.mp4"}
+        end
+
+        # PubSub: notifica download concluído se houver download_id
+        if download_id = params["download_id"] do
+          Phoenix.PubSub.broadcast(VideoDownloaderElixir.PubSub, "download:#{download_id}", {:download_complete, %{filename: filename}})
         end
 
         conn

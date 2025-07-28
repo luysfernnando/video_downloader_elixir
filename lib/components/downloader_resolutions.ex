@@ -16,24 +16,30 @@ defmodule VideoDownloaderElixirWeb.Components.DownloaderResolutions do
           <div class="flex gap-2 mt-2">
             <a
               id="video-download"
-              href={"/api/download?url=" <> URI.encode_www_form(@url) <> "&format_id=" <> (List.first(@formats)[:id] || "") <> "&type=video"}
+              href={"/api/download?url=" <> URI.encode_www_form(@url) <> "&format_id=" <> (List.first(@formats)[:id] || "") <> "&type=video" <> if(@download_id, do: "&download_id=" <> @download_id, else: "")}
               class="btn btn-success flex-1 btn-hover-effect"
               download
-              onclick="showFlashSuccess('Download de vídeo iniciado!')"
+              phx-click="start_download"
+              phx-value-format_id={List.first(@formats)[:id] || ""}
+              phx-value-type="video"
             >
               Baixar MP4
             </a>
             <a
               id="audio-download"
-              href={"/api/download?url=" <> URI.encode_www_form(@url) <> "&format_id=" <> (List.first(@formats)[:id] || "") <> "&type=audio"}
+              href={"/api/download?url=" <> URI.encode_www_form(@url) <> "&format_id=" <> (List.first(@formats)[:id] || "") <> "&type=audio" <> if(@download_id, do: "&download_id=" <> @download_id, else: "")}
               class="btn btn-accent flex-1 btn-hover-effect"
               download
-              onclick="showFlashSuccess('Download de áudio iniciado!')"
+              phx-click="start_download"
+              phx-value-format_id={List.first(@formats)[:id] || ""}
+              phx-value-type="audio"
             >
               Baixar MP3
             </a>
           </div>
         </div>
+
+        <div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center space-y-2"></div>
 
         <script>
           function updateDownloadLinks() {
@@ -46,15 +52,23 @@ defmodule VideoDownloaderElixirWeb.Components.DownloaderResolutions do
             audioLink.href = `/api/download?url=${encodeURIComponent(url)}&format_id=${selectedFormat}&type=audio`;
           }
 
-          function showFlashSuccess(msg) {
-            let flash = document.createElement('div');
-            flash.className = 'alert alert-success fixed top-6 left-1/2 -translate-x-1/2 z-50 shadow-lg animate-fade-in flex items-center gap-2 px-6 py-3 text-lg font-semibold';
-            flash.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>${msg}</span>`;
-            document.body.appendChild(flash);
+          function showToast(msg) {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+              container = document.createElement('div');
+              container.id = 'toast-container';
+              container.className = 'fixed top-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center space-y-2';
+              document.body.appendChild(container);
+            }
+            let toast = document.createElement('div');
+            toast.className = 'toast toast-top toast-center bg-success text-base-100 shadow-lg animate-fade-in px-6 py-3 rounded-lg flex items-center gap-2 font-semibold text-lg';
+            toast.innerHTML = `<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"stroke-current shrink-0 h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12l2 2l4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z\" /></svg><span>${msg}</span>`;
+            container.appendChild(toast);
             setTimeout(() => {
-              flash.classList.add('animate-fade-out');
-              setTimeout(() => flash.remove(), 500);
+              toast.classList.add('animate-fade-out');
+              setTimeout(() => toast.remove(), 500);
             }, 2500);
+            return true;
           }
 
           document.getElementById('format-select').addEventListener('change', updateDownloadLinks);
