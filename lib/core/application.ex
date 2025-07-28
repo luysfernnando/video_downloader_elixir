@@ -9,6 +9,9 @@ defmodule VideoDownloaderElixir.Core.Application do
   def start(_type, _args) do
     children = [
       {Phoenix.PubSub, name: VideoDownloaderElixir.PubSub},
+      # Serviços otimizados
+      VideoDownloaderElixir.Services.MetadataCache,
+      VideoDownloaderElixir.Services.DownloadProgress,
       # Start to serve requests, typically the last entry
       VideoDownloaderElixirWeb.Core.Endpoint
     ]

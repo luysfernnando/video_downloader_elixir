@@ -38,3 +38,5 @@ video_downloader_elixir-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore cursor files
+/.cursor

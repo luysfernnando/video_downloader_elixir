@@ -17,6 +17,11 @@ defmodule VideoDownloaderElixirWeb.Pages do
     use VideoDownloaderElixirWeb, :page
   end
 
+  defmodule Downloader do
+    @moduledoc "Página de download de vídeos/músicas"
+    use VideoDownloaderElixirWeb, :page
+  end
+
   # Adicionar páginas é SUPER simples - apenas 3 linhas:
   #
   # defmodule About do

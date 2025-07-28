@@ -43,7 +43,8 @@ defmodule VideoDownloaderElixirWeb.Core.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Phoenix.json_library()
+    json_decoder: Phoenix.json_library(),
+    length: 100_000_000  # 100MB para permitir downloads grandes
 
   plug Plug.MethodOverride
   plug Plug.Head
