@@ -40,12 +40,3 @@ defmodule VideoDownloaderElixirWeb.Pages do
   #   use VideoDownloaderElixirWeb, {:page, folder: "config"}
   # end
 end
-
-defmodule VideoDownloaderElixirWeb.Controllers.PageHTML do
-  @moduledoc """
-  Alias para manter compatibilidade com o PageController
-  """
-  alias VideoDownloaderElixirWeb.Pages.Home
-
-  def home(assigns), do: Home.home(assigns)
-end

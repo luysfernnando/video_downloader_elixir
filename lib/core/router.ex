@@ -18,17 +18,11 @@ defmodule VideoDownloaderElixirWeb.Core.Router do
     plug :accepts, ["*/*"]
   end
 
-  scope "/", VideoDownloaderElixirWeb.Controllers do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
-
-  # Página de download como LiveView
+  # Página principal como LiveView
   import Phoenix.LiveView.Router
   scope "/", VideoDownloaderElixirWeb.Pages do
     pipe_through :browser
-    live "/downloader", DownloaderLive, :show
+    live "/", HomeLive, :show
   end
 
   # Rotas API para download de vídeos/músicas
