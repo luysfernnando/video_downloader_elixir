@@ -2,16 +2,10 @@ import Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :video_downloader_elixir, VideoDownloaderElixirWeb.Endpoint,
+config :video_downloader_elixir, VideoDownloaderElixirWeb.Core.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "D/ia0v8hvia08gZ2W2veJnBKLefv0cFMsyVLSNm2J4jzDq3PqO1WVTvV3n9Bh7PG",
   server: false
-
-# In test we don't send emails
-config :video_downloader_elixir, VideoDownloaderElixir.Mailer, adapter: Swoosh.Adapters.Test
-
-# Disable swoosh api client as it is only required for production adapters
-config :swoosh, :api_client, false
 
 # Print only warnings and errors during test
 config :logger, level: :warning

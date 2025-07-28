@@ -11,25 +11,17 @@ config :video_downloader_elixir,
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
-config :video_downloader_elixir, VideoDownloaderElixirWeb.Endpoint,
+config :video_downloader_elixir, VideoDownloaderElixirWeb.Core.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: VideoDownloaderElixirWeb.ErrorHTML, json: VideoDownloaderElixirWeb.ErrorJSON],
+    formats: [html: VideoDownloaderElixirWeb.Views.ErrorHTML, json: VideoDownloaderElixirWeb.Views.ErrorJSON],
     layout: false
   ],
   pubsub_server: VideoDownloaderElixir.PubSub,
   live_view: [signing_salt: "UTC5PG58"]
 
 # Configures the mailer
-#
-# By default it uses the "Local" adapter which stores the emails
-# locally. You can see the emails in your browser, at "/dev/mailbox".
-#
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
-config :video_downloader_elixir, VideoDownloaderElixir.Mailer, adapter: Swoosh.Adapters.Local
-
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",

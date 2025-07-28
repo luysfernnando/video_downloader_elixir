@@ -1,4 +1,4 @@
-defmodule VideoDownloaderElixirWeb.Endpoint do
+defmodule VideoDownloaderElixirWeb.Core.Endpoint do
   use Phoenix.Endpoint, otp_app: :video_downloader_elixir
 
   # The session will be stored in the cookie and signed,
@@ -48,5 +48,5 @@ defmodule VideoDownloaderElixirWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug VideoDownloaderElixirWeb.Router
+  plug VideoDownloaderElixirWeb.Core.Router
 end

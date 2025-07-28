@@ -1,4 +1,4 @@
-defmodule VideoDownloaderElixirWeb.Gettext do
+defmodule VideoDownloaderElixirWeb.Core.Gettext do
   @moduledoc """
   A module providing Internationalization with a gettext-based API.
 
@@ -6,7 +6,7 @@ defmodule VideoDownloaderElixirWeb.Gettext do
   that you can use in your application. To use this Gettext backend module,
   call `use Gettext` and pass it as an option:
 
-      use Gettext, backend: VideoDownloaderElixirWeb.Gettext
+      use Gettext, backend: VideoDownloaderElixirWeb.Core.Gettext
 
       # Simple translation
       gettext("Here is the string to translate")

@@ -8,8 +8,8 @@ const path = require("path")
 module.exports = {
   content: [
     "./js/**/*.js",
-    "../lib/video_downloader_elixir_web.ex",
-    "../lib/video_downloader_elixir_web/**/*.*ex"
+    "../lib/web.ex",
+    "../lib/**/*.*ex"
   ],
   theme: {
     extend: {
