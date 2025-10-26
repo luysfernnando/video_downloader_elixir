@@ -4,7 +4,7 @@
 
 ```bash
 # Instalar dependências do sistema (Arch Linux)
-sudo pacman -S yt-dlp
+sudo pacman -S yt-dlp ffmpeg
 
 # Instalar dependências do projeto
 mix deps.get
