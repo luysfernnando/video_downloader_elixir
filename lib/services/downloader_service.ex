@@ -1,5 +1,12 @@
 defmodule VideoDownloaderElixir.Services.DownloaderService do
-  @moduledoc "Serviço para baixar vídeos e músicas de YouTube, Facebook e Instagram usando yt-dlp."
+  @moduledoc """
+  Serviço para baixar vídeos e músicas de YouTube, Facebook e Instagram usando yt-dlp.
+  
+  Suporta:
+  - YouTube: resoluções padrão (720p, 1080p, etc) e áudio MP3
+  - Facebook: vídeos verticais e horizontais (720x1280, 1080x1920, etc) e áudio
+  - Instagram: reels e vídeos (720x1280, 1080x1920, etc) e áudio
+  """
 
   @yt_dlp_cmd "yt-dlp"
 
@@ -123,8 +130,11 @@ defmodule VideoDownloaderElixir.Services.DownloaderService do
   # Verifica se o format_id é numérico ou complexo (Facebook/Instagram)
   defp is_numeric_or_complex_id?(format_id) do
     # IDs complexos do Facebook/Instagram contêm letras no final
-    # Ex: "844688081403094v", "1448018849630974v"
-    String.match?(format_id, ~r/\d+[a-z]$/) or String.match?(format_id, ~r/^\d{10,}/)
+    # Ex Facebook: "844688081403094v", "1448018849630974v"
+    # Ex Instagram: "dash-1152764252955533vd", "dash-814334291528654ad"
+    String.match?(format_id, ~r/^dash-\d+[a-z]+$/) or  # Instagram: dash-XXXXXvd, dash-XXXXXad
+    String.match?(format_id, ~r/\d+[a-z]$/) or         # Facebook: XXXXXv
+    String.match?(format_id, ~r/^\d{10,}/)             # IDs numéricos longos
   end
 
   defp parse_resolutions(output) do
