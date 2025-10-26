@@ -33,6 +33,13 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
     {:noreply, socket}
   end
 
+  def handle_event("start_download", %{"format_id" => format_id, "type" => type}, socket) do
+    # Gera um download_id único
+    download_id = :crypto.hash(:sha256, "#{socket.assigns.url}-#{format_id}-#{type}") |> Base.encode16()
+    Phoenix.PubSub.subscribe(VideoDownloaderElixir.PubSub, "download:#{download_id}")
+    {:noreply, assign(socket, download_id: download_id)}
+  end
+
   def handle_info({:fetch_metadata, url}, socket) do
     Debug.log(:info, "🔄 Buscando metadados básicos para: #{url}")
     # Busca metadados básicos (pode demorar, mas loading já está na tela)
@@ -132,16 +139,19 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
      |> assign(loading: false)}
   end
 
-  def handle_event("start_download", %{"format_id" => format_id, "type" => type}, socket) do
-    # Gera um download_id único
-    download_id = :crypto.hash(:sha256, "#{socket.assigns.url}-#{format_id}-#{type}") |> Base.encode16()
-    Phoenix.PubSub.subscribe(VideoDownloaderElixir.PubSub, "download:#{download_id}")
-    {:noreply, assign(socket, download_id: download_id)}
-  end
-
   def handle_info({:download_complete, _}, socket) do
     {:noreply, put_flash(socket, :success, "Arquivo salvo com sucesso!")}
   end
+
+  # Helper para formatar duração
+  defp format_duration(nil), do: "Duração desconhecida"
+  defp format_duration(duration) when is_number(duration) do
+    duration_int = trunc(duration)
+    minutes = div(duration_int, 60)
+    seconds = rem(duration_int, 60)
+    "#{minutes}m #{seconds}s"
+  end
+  defp format_duration(_), do: "Duração desconhecida"
 
   def render(assigns) do
     ~H"""
@@ -171,7 +181,7 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
                 <div class="font-bold text-lg leading-tight"><%= @meta.title || "Título não encontrado" %></div>
                 <div class="text-sm opacity-70 mt-2">
                   <span class="font-semibold">Duração:</span>
-                  <%= if @meta.duration, do: " #{div(@meta.duration, 60)}m #{rem(@meta.duration, 60)}s", else: " Duração desconhecida" %><br/>
+                  <%= " " <> format_duration(@meta.duration) %><br/>
                   <span class="font-semibold">Tamanho:</span>
                   <%= if @meta.filesize && @meta.filesize > 0, do: " #{Float.round(@meta.filesize / 1024 / 1024, 2)} MB", else: " Tamanho desconhecido" %>
                 </div>
@@ -182,13 +192,13 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
               <div class="flex flex-col items-center gap-3 mt-4 p-4 bg-base-200 rounded-lg animate-bounce-in">
                 <img src={@basic_meta.thumbnail || "/images/placeholder.png"} class="rounded-lg w-32 h-32 object-cover border border-base-300 shadow-md" alt="thumbnail" />
                 <div class="text-center">
-                  <div class="font-bold text-lg leading-tight"><%= @basic_meta.title || "Título não encontrado" %></div>
-                  <div class="text-sm opacity-70 mt-2">
-                    <span class="font-semibold">Duração:</span>
-                    <%= if @basic_meta.duration, do: " #{div(@basic_meta.duration, 60)}m #{rem(@basic_meta.duration, 60)}s", else: " Duração desconhecida" %><br/>
-                    <span class="font-semibold">Tamanho:</span>
-                    <span class="animate-pulse"> Verificando...</span>
-                  </div>
+                <div class="font-bold text-lg leading-tight"><%= @basic_meta.title || "Título não encontrado" %></div>
+                <div class="text-sm opacity-70 mt-2">
+                  <span class="font-semibold">Duração:</span>
+                  <%= " " <> format_duration(@basic_meta.duration) %><br/>
+                  <span class="font-semibold">Tamanho:</span>
+                  <span class="animate-pulse"> Verificando...</span>
+                </div>
                 </div>
               </div>
             <% end %>
