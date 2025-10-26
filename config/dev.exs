@@ -1,5 +1,21 @@
 import Config
 
+# Carrega variáveis de ambiente do arquivo .env (se existir)
+if File.exists?(".env") do
+  File.read!(".env")
+  |> String.split("\n", trim: true)
+  |> Enum.reject(&String.starts_with?(&1, "#"))
+  |> Enum.each(fn line ->
+    case String.split(line, "=", parts: 2) do
+      [key, value] -> System.put_env(key, value)
+      _ -> :ok
+    end
+  end)
+end
+
+# Configuração de debug logs
+config :video_downloader_elixir, :debug_logs, System.get_env("DEBUG_LOGS", "false") == "true"
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

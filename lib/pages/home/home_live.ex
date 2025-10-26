@@ -2,6 +2,7 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
   use Phoenix.LiveView, layout: {VideoDownloaderElixirWeb.Layouts, :root}
   alias VideoDownloaderElixirWeb.Components.{DownloaderForm, DownloaderResolutions}
   alias VideoDownloaderElixir.Services.{DownloaderService, MetadataCache}
+  alias VideoDownloaderElixir.Core.Debug
 
   def mount(_params, _session, socket) do
     {:ok, assign(socket,
@@ -33,24 +34,36 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
   end
 
   def handle_info({:fetch_metadata, url}, socket) do
+    Debug.log(:info, "🔄 Buscando metadados básicos para: #{url}")
     # Busca metadados básicos (pode demorar, mas loading já está na tela)
     basic_meta =
       case VideoDownloaderElixir.Services.MetadataService.get_basic_metadata(url) do
-        {:ok, meta} -> meta
-        _ -> nil
+        {:ok, meta} ->
+          Debug.log(:info, "✅ Metadados básicos obtidos: #{inspect(meta)}")
+          meta
+        error ->
+          Debug.log(:error, "❌ Erro ao buscar metadados básicos: #{inspect(error)}")
+          nil
       end
     socket = assign(socket, basic_meta: basic_meta, processing: false)
+    Debug.log(:info, "📤 Enviando mensagem fetch_full_metadata")
     send(self(), {:fetch_full_metadata, url})
     {:noreply, socket}
   end
 
   def handle_info({:fetch_full_metadata, url}, socket) do
+    alias VideoDownloaderElixir.Core.Debug
+    Debug.log(:info, "📥 Recebeu fetch_full_metadata para: #{url}")
+    Debug.log(:info, "🔌 Subscribing no PubSub: metadata:#{url}")
     Phoenix.PubSub.subscribe(VideoDownloaderElixir.PubSub, "metadata:#{url}")
+
     case MetadataCache.get_metadata(url) do
       {:ok, meta} ->
+        Debug.log(:info, "✅ Cache HIT - Metadados completos: #{inspect(meta)}")
         # Metadados completos já em cache
         case DownloaderService.list_resolutions(url) do
           {:ok, formats} ->
+            Debug.log(:info, "✅ Formatos obtidos: #{length(formats)}")
             {:noreply, assign(socket,
               formats: formats,
               meta: meta,
@@ -59,6 +72,7 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
               show_results: true
             )}
           {:error, msg} ->
+            Debug.log(:error, "❌ Erro ao listar resoluções: #{msg}")
             {:noreply, assign(socket,
               error: msg,
               formats: [],
@@ -68,9 +82,11 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
             )}
         end
       {:loading, _url} ->
+        Debug.log(:info, "⏳ Cache MISS - Metadados sendo carregados...")
         # Metadados completos sendo carregados
         case DownloaderService.list_resolutions(url) do
           {:ok, formats} ->
+            Debug.log(:info, "✅ Formatos obtidos (cache loading): #{length(formats)}")
             {:noreply, assign(socket,
               formats: formats,
               meta: nil,
@@ -79,6 +95,7 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
               show_results: true
             )}
           {:error, msg} ->
+            Debug.log(:error, "❌ Erro ao listar resoluções (cache loading): #{msg}")
             {:noreply, assign(socket,
               error: msg,
               formats: [],
@@ -88,6 +105,7 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
             )}
         end
       {:error, msg} ->
+        Debug.log(:error, "❌ Erro no cache: #{msg}")
         {:noreply, assign(socket,
           error: msg,
           formats: [],
@@ -100,6 +118,9 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
 
   # Recebe metadados completos via PubSub
   def handle_info({:metadata_ready, meta}, socket) do
+    alias VideoDownloaderElixir.Core.Debug
+    Debug.log(:info, "🎉 Metadados recebidos via PubSub: #{inspect(meta)}")
+    Debug.log(:info, "📊 Estado atual - loading: #{socket.assigns.loading}, show_results: #{socket.assigns.show_results}")
     # Atualiza a tela com metadados completos
     {:noreply, assign(socket, meta: meta, loading: false, show_results: true)}
   end
@@ -143,6 +164,7 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
           <% end %>
 
           <%= if @meta do %>
+            <!-- DEBUG: meta presente com filesize: <%= inspect(@meta.filesize) %> -->
             <div class="flex flex-col items-center gap-3 mt-4 p-4 bg-base-200 rounded-lg animate-bounce-in">
               <img src={@meta.thumbnail || "/images/placeholder.png"} class="rounded-lg w-32 h-32 object-cover border border-base-300 shadow-md" alt="thumbnail" />
               <div class="text-center">
@@ -173,6 +195,7 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
           <% end %>
 
           <%= if !@processing and @formats && @formats != [] do %>
+            <!-- DEBUG: Mostrando formatos - total: <%= length(@formats) %>, processing: <%= @processing %> -->
             <.live_component module={DownloaderResolutions} id="downloader-resolutions" formats={@formats} url={@url} download_id={@download_id} phx-click="start_download" />
           <% end %>
 

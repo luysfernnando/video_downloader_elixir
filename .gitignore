@@ -40,3 +40,6 @@ npm-debug.log
 
 # Ignore cursor files
 /.cursor
+
+# Environment variables
+.env

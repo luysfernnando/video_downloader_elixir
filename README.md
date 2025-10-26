@@ -1,18 +1,37 @@
 # VideoDownloaderElixir
 
-To start your Phoenix server:
+## Como rodar o projeto
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+```bash
+# Instalar dependências do sistema (Arch Linux)
+sudo pacman -S yt-dlp
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+# Instalar dependências do projeto
+mix deps.get
+cd assets && npm install
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+# Configurar variáveis de ambiente (opcional)
+cp .env.example .env
+# Edite o arquivo .env para alterar DEBUG_LOGS=true/false
 
-## Learn more
+# Iniciar o servidor
+mix phx.server
+```
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Acesse [`localhost:4000`](http://localhost:4000)
+
+## Configuração
+
+### Debug Logs
+
+Para habilitar/desabilitar logs de debug, edite o arquivo `.env`:
+
+```bash
+# Habilitar logs de debug
+DEBUG_LOGS=true
+
+# Desabilitar logs de debug
+DEBUG_LOGS=false
+```
+
+Reinicie o servidor após alterar as configurações.
