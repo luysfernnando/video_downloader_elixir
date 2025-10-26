@@ -84,7 +84,8 @@ defmodule VideoDownloaderElixir.Services.MetadataCache do
       nil -> :not_found
       %{data: data, timestamp: timestamp} ->
         now = System.system_time(:second)
-        if now - timestamp < @cache_ttl do
+        # Se o filesize for 0, consideramos como inválido e buscamos novamente
+        if now - timestamp < @cache_ttl and (data.filesize || 0) > 0 do
           {:ok, data}
         else
           :expired

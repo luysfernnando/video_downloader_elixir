@@ -5,12 +5,35 @@ defmodule VideoDownloaderElixir.Services.DownloaderService do
 
   @doc "Retorna as resoluções disponíveis para um vídeo."
   def list_resolutions(url) do
-    args = ["-F", url]
-    case System.cmd(@yt_dlp_cmd, args, stderr_to_stdout: true) do
-      {output, 0} ->
-        parse_resolutions(output)
-      {output, _} ->
+    alias VideoDownloaderElixir.Core.Debug
+    Debug.log(:info, "🎬 DownloaderService.list_resolutions chamado para: #{url}")
+
+    # Adiciona flags para acelerar e evitar warnings
+    args = [
+      "-F",
+      "--no-warnings",
+      "--no-playlist",
+      "--skip-download",
+      url
+    ]
+
+    # Usa Task com timeout para evitar travamentos
+    task = Task.async(fn ->
+      System.cmd(@yt_dlp_cmd, args, stderr_to_stdout: true)
+    end)
+
+    case Task.yield(task, 30_000) || Task.shutdown(task) do
+      {:ok, {output, 0}} ->
+        Debug.log(:info, "✅ yt-dlp -F executado com sucesso")
+        result = parse_resolutions(output)
+        Debug.log(:info, "📊 Resultado parse_resolutions: #{inspect(result)}")
+        result
+      {:ok, {output, code}} ->
+        Debug.log(:error, "❌ yt-dlp -F falhou com código #{code}: #{String.slice(output, 0, 200)}")
         {:error, output}
+      nil ->
+        Debug.log(:error, "⏱️ Timeout ao executar yt-dlp -F")
+        {:error, "Timeout ao buscar resoluções"}
     end
   end
 

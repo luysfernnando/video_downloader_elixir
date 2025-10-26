@@ -173,7 +173,7 @@ defmodule VideoDownloaderElixirWeb.Pages.HomeLive do
                   <span class="font-semibold">Duração:</span>
                   <%= if @meta.duration, do: " #{div(@meta.duration, 60)}m #{rem(@meta.duration, 60)}s", else: " Duração desconhecida" %><br/>
                   <span class="font-semibold">Tamanho:</span>
-                  <%= if @meta.filesize, do: " #{Float.round(@meta.filesize / 1024 / 1024, 2)} MB", else: " Tamanho desconhecido" %>
+                  <%= if @meta.filesize && @meta.filesize > 0, do: " #{Float.round(@meta.filesize / 1024 / 1024, 2)} MB", else: " Tamanho desconhecido" %>
                 </div>
               </div>
             </div>
