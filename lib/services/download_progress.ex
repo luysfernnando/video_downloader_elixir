@@ -1,6 +1,5 @@
 defmodule VideoDownloaderElixir.Services.DownloadProgress do
   use GenServer
-  alias VideoDownloaderElixir.Core.Debug
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)

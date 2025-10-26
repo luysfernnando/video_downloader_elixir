@@ -36,6 +36,7 @@ defmodule VideoDownloaderElixirWeb.Core.Router do
     pipe_through :download
     post "/download", DownloaderController, :download
     get "/download", DownloaderController, :download
+    get "/thumbnail/:url", ThumbnailProxyController, :show
   end
 
   # Enable LiveDashboard in development

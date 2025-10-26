@@ -52,6 +52,7 @@ defmodule VideoDownloaderElixir.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.5"},
+      {:req, "~> 0.5"},
 
       # Development only
       {:phoenix_live_reload, "~> 1.2", only: :dev},

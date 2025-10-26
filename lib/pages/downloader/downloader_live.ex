@@ -121,6 +121,12 @@ defmodule VideoDownloaderElixirWeb.Pages.DownloaderLive do
      |> assign(loading: false)}
   end
 
+  defp proxy_thumbnail(nil), do: "/images/placeholder.png"
+  defp proxy_thumbnail(url) do
+    encoded = Base.url_encode64(url, padding: false)
+    "/api/thumbnail/#{encoded}"
+  end
+
   def render(assigns) do
     ~H"""
     <div class="min-h-screen flex items-center justify-center bg-base-200">
@@ -142,7 +148,7 @@ defmodule VideoDownloaderElixirWeb.Pages.DownloaderLive do
 
           <%= if @meta do %>
             <div class="flex flex-col items-center gap-2 mt-2 animate-bounce-in">
-              <img src={@meta.thumbnail || "/images/placeholder.png"} class="rounded-lg w-32 h-32 object-cover border border-base-300" alt="thumbnail" />
+              <img src={proxy_thumbnail(@meta.thumbnail)} class="rounded-lg w-32 h-32 object-cover border border-base-300" alt="thumbnail" />
               <div class="text-center">
                 <div class="font-bold text-lg"><%= @meta.title || "Título não encontrado" %></div>
                 <div class="text-sm opacity-70">
