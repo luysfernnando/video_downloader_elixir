@@ -17,7 +17,7 @@ import Config
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :video_downloader_elixir, VideoDownloaderElixirWeb.Endpoint, server: true
+  config :video_downloader_elixir, VideoDownloaderElixirWeb.Core.Endpoint, server: true
 end
 
 if config_env() == :prod do
@@ -38,7 +38,7 @@ if config_env() == :prod do
 
   config :video_downloader_elixir, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  config :video_downloader_elixir, VideoDownloaderElixirWeb.Endpoint,
+  config :video_downloader_elixir, VideoDownloaderElixirWeb.Core.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
       # Enable IPv6 and bind on all interfaces.

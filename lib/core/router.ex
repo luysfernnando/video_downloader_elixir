@@ -39,14 +39,15 @@ defmodule VideoDownloaderElixirWeb.Core.Router do
     get "/thumbnail/:url", ThumbnailProxyController, :show
   end
 
-  # Enable LiveDashboard in development
-  if Application.compile_env(:video_downloader_elixir, :dev_routes) do
-    import Phoenix.LiveDashboard.Router
-
-    scope "/dev" do
-      pipe_through :browser
-
-      live_dashboard "/dashboard"
-    end
-  end
+  # LiveDashboard está desabilitado para evitar dependência em produção
+  # Para habilitar em dev, descomente as linhas abaixo:
+  #
+  # if Application.compile_env(:video_downloader_elixir, :dev_routes) do
+  #   import Phoenix.LiveDashboard.Router
+  #
+  #   scope "/dev" do
+  #     pipe_through :browser
+  #     live_dashboard "/dashboard"
+  #   end
+  # end
 end

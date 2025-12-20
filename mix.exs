@@ -56,7 +56,8 @@ defmodule VideoDownloaderElixir.MixProject do
 
       # Development only
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_dashboard, "~> 0.8.3", only: :dev},
+      # Phoenix LiveDashboard removido para evitar problemas em produção
+      # {:phoenix_live_dashboard, "~> 0.8.3", only: :dev},
 
       # Test only
       {:floki, ">= 0.30.0", only: :test}
