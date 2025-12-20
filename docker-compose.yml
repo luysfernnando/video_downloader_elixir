@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  app:
+    image: ${DOCKER_USERNAME}/video-downloader-elixir:${VERSION:-latest}
+    container_name: video_downloader
+    restart: unless-stopped
+    
+    # Limites de recursos otimizados para VPS de 1GB RAM
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'        # 1 core completo
+          memory: 512M       # Máximo de 512MB para a aplicação
+        reservations:
+          cpus: '0.5'        # Mínimo de 50% do core
+          memory: 256M       # Mínimo de 256MB
+    
+    # Variáveis de ambiente
+    environment:
+      - PHX_SERVER=true
+      - PHX_HOST=${PHX_HOST:-localhost}
+      - PORT=4000
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - MIX_ENV=prod
+      
+      # Otimizações de memória para VM +compacta
+      - ERL_MAX_PORTS=4096
+      - ELIXIR_ERL_OPTIONS="+sbwt none +sbwtdcpu none +sbwtdio none"
+      
+    # Portas
+    ports:
+      - "${APP_PORT:-4000}:4000"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    
+    # Logs otimizados (evita uso excessivo de disco)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Networks
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

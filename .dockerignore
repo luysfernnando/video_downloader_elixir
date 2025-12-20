@@ -1,0 +1,57 @@
+# Elixir / Mix
+/_build/
+/deps/
+*.ez
+
+# Assets / Node
+/assets/node_modules/
+npm-debug.log
+yarn-error.log
+
+# Static files compilados
+/priv/static/
+
+# Database
+*.db
+*.db-*
+
+# Logs
+*.log
+
+# Temporary files
+*.swp
+*.swo
+*~
+.DS_Store
+
+# IDE / Editors
+.vscode/
+.idea/
+*.sublime-*
+
+# OS
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+.dockerignore
+docker-compose*.yml
+Dockerfile*
+
+# CI/CD
+.github/
+
+# Documentation
+README.md
+LICENSE.md
+CHANGELOG.md
+
+# Test files
+/test/
+
+# Development config
+.env
+.env.*
