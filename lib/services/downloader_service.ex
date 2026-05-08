@@ -167,6 +167,7 @@ defmodule VideoDownloaderElixir.Services.DownloaderService do
       end)
       |> Enum.filter(&(&1 != nil))
       |> Enum.uniq_by(& &1.desc)
+      |> Enum.filter(fn f -> resolution_to_number(f.desc) >= 144 end)
       |> Enum.sort_by(&resolution_to_number(&1.desc), :desc)  # Ordena da maior para menor
 
     Debug.log(:info, "📊 Formatos parseados: #{inspect(formats)}")
